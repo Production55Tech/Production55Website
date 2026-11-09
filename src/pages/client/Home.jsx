@@ -1,6 +1,6 @@
-import HighlightHoverText from "../components/HighlightHoverText";
-import HighlightHoverImage from "../components/HighlightHoverImage";
-import ClientsCarousel from "../components/carousel/NotableClientsCarousel";
+import HighlightHoverText from "../../components/HighlightHoverText";
+import HighlightHoverImage from "../../components/HighlightHoverImage";
+import ClientsCarousel from "../../components/carousel/NotableClientsCarousel";
 import { NavLink } from "react-router-dom";
 
 export default function Home() {

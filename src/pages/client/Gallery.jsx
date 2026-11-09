@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { projects } from "../data/projects";
+import { projects } from "../../data/projects";
 import { useState } from "react";
-import ProjectMediaCarousel from "../components/carousel/ProjectMediaCarousel";
-import ProjectsCarousel from "../components/carousel/ProjectsCarousel";
+import ProjectMediaCarousel from "../../components/carousel/ProjectMediaCarousel";
+import ProjectsCarousel from "../../components/carousel/ProjectsCarousel";
 
 export default function Gallery() {
   const { slug } = useParams();

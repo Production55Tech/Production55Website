@@ -1,6 +1,6 @@
 import { SignOutButton } from "../buttons/SignoutButton";
 
-export default function InternHeader() {
+export default function AdminHeader() {
   return (
     <header className="relative h-[7vh] sticky top-0 z-50 bg-black border-b border-gray-800 content-center">
       <div className="flex flex-row">
@@ -10,7 +10,7 @@ export default function InternHeader() {
             className="w-[7dvw] h-[7dvh] object-contain"
           />
         </div>
-        <div className="flex basis-[50dvw] justify-end mx-5">
+        <div className="flex basis-[50dvw] justify-end px-5">
           <SignOutButton />
         </div>
       </div>

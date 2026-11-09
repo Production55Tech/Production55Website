@@ -4,5 +4,5 @@ import { useAuth } from "../db/authContext";
 export default function ProtectedRoute() {
   const { userLoggedIn, loading } = useAuth();
 
-  return userLoggedIn ? <Outlet /> : <Navigate to="/intern-login" replace />;
+  return userLoggedIn ? <Outlet /> : <Navigate to="/" replace />;
 }

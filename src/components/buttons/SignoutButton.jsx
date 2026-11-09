@@ -8,7 +8,7 @@ export const SignOutButton = () => {
   const signOut = async () => {
     try {
       await doSignOut();
-      navigate("/intern-login", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       console.log(err);
     }
