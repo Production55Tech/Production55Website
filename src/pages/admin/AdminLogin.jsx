@@ -1,11 +1,11 @@
-import { doSignInWithEmailAndPassword } from "../db/services/auth";
-import { useAuth } from "../db/authContext";
+import { doSignInWithEmailAndPassword } from "../../db/services/auth";
+import { useAuth } from "../../db/authContext";
 import React, { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { getLoginErrorMessage } from "../components/helper/UserAuthErrorMessageHelper";
+import { getLoginErrorMessage } from "../../components/helper/UserAuthErrorMessageHelper";
 
-export default function InternLogin() {
+export default function AdminLogin() {
   const { userLoggedIn } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -44,8 +44,8 @@ export default function InternLogin() {
 
   return (
     <div>
-      {userLoggedIn && <Navigate to={"/intern-dashboard"} replace={true} />}
-      <div className="flex justify-center items-center min-h-screen min-w-screen bg-white">
+      {userLoggedIn && <Navigate to={"/admin-dashboard"} replace={true} />}
+      <div className="flex justify-center items-center min-h-screen min-w-screen">
         <div className="w-lg bg-black text-white rounded-md p-8">
           <form onSubmit={onSubmit}>
             <div className="flex flex-col">
@@ -64,7 +64,7 @@ export default function InternLogin() {
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}
-                className="text-white text-sm placeholder:text-gray-500 p-3 rounded-sm my-3 w-full border border-gray-600 focus:outline-1"
+                className="font-prodFont text-white text-sm placeholder:text-gray-500 p-3 rounded-sm my-3 w-full border border-gray-600 focus:outline-1"
               />
               <label className="text-sm text-prod-pink font-bold">
                 Password
@@ -79,13 +79,13 @@ export default function InternLogin() {
                   onChange={(e) => {
                     setPassword(e.target.value);
                   }}
-                  className="text-white text-sm placeholder:text-gray-500 p-3 rounded-sm my-3 w-full border border-gray-600 focus:outline-1"
+                  className="font-prodFont text-white text-sm placeholder:text-gray-500 p-3 rounded-sm my-3 w-full border border-gray-600 focus:outline-1"
                 />
                 <button
                   type="button"
                   onClick={() => setShow((s) => !s)}
                   aria-label={show ? "Hide password" : "Show password"}
-                  className="absolute inset-y-0 py-auto right-4 flex items-center focus:outline-0"
+                  className="absolute inset-y-0 py-auto right-4 flex items-center focus:outline-hidden"
                 >
                   {show ? (
                     <EyeOff size={22} className="text-prod-pink" />
@@ -96,16 +96,10 @@ export default function InternLogin() {
               </div>
               <button
                 type="submit"
-                className="bg-prod-pink w-full mt-4 p-2 rounded-sm focus:outline-1"
+                className="bg-white text-black transition-colors ease-in-out hover:bg-prod-pink hover:text-white w-full mt-4 p-2 rounded-sm"
               >
                 Login
               </button>
-              <Link
-                to="/intern-register"
-                className="text-white text-center mt-4 hover:underline active:outline-0 focus:outline-1"
-              >
-                I don't have an account
-              </Link>
             </div>
           </form>
         </div>

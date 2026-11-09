@@ -1,21 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Gallery from "./pages/Gallery";
-import Crew from "./pages/Crew";
-import CrewMember from "./pages/CrewMember";
-import Gears from "./pages/Gears";
-import GearDetail from "./pages/GearDetail";
-import Reviews from "./pages/Reviews";
-import Contact from "./pages/Contact";
-import AboutUs from "./pages/AboutUs";
-import InternLogin from "./pages/InternLogin";
-import InternRegister from "./pages/InternRegister";
-import InternDashboard from "./pages/InternDashboard";
-import NotFound from "./pages/NotFound";
+import Home from "./pages/client/Home";
+import Gallery from "./pages/client/Gallery";
+import Crew from "./pages/client/Crew";
+import CrewMember from "./pages/client/CrewMember";
+import Gears from "./pages/client/Gears";
+import GearDetail from "./pages/client/GearDetail";
+import Reviews from "./pages/client/Reviews";
+import Contact from "./pages/client/Contact";
+import AboutUs from "./pages/client/AboutUs";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import NotFound from "./pages/client/NotFound";
 import { AuthProvider } from "./db/authContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ClientPageLayout from "./components/layouts/ClientPageLayout";
-import InternPageLayout from "./components/layouts/InternPageLayout";
+import AdminPageLayout from "./components/layouts/AdminPageLayout";
 
 function App() {
   return (
@@ -36,12 +35,11 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
 
-            <Route path="/intern-login" element={<InternLogin />} />
-            <Route path="/intern-register" element={<InternRegister />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
 
-            <Route element={<InternPageLayout />}>
+            <Route element={<AdminPageLayout />}>
               <Route element={<ProtectedRoute />}>
-                <Route path="/intern-dashboard" element={<InternDashboard />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
               </Route>
             </Route>
           </Routes>
