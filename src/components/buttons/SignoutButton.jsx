@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { authService } from "../../db/services/userAuthServices";
 import { LogOut } from "lucide-react";
 
 export const SignOutButton = () => {
@@ -6,7 +7,7 @@ export const SignOutButton = () => {
 
   const signOut = async () => {
     try {
-      await doSignOut();
+      await authService.signOut();
       navigate("/", { replace: true });
     } catch (err) {
       console.log(err);
