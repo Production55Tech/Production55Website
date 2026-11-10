@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { doSignOut } from "../../db/services/auth";
 import { LogOut } from "lucide-react";
 
 export const SignOutButton = () => {

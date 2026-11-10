@@ -1,50 +1,37 @@
-import { doSignInWithEmailAndPassword } from "../../db/services/auth";
-import { useAuth } from "../../db/authContext";
 import React, { useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate, replace } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { getLoginErrorMessage } from "../../components/helper/UserAuthErrorMessageHelper";
+import { authService } from "../../db/services/userAuthServices";
 
 export default function AdminLogin() {
-  const { userLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [show, setShow] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (isSigningIn) return;
-
-    setIsSigningIn(true);
-    setErrorMessage("");
+    setErrorMessage(null);
+    setLoading(true);
 
     try {
-      await doSignInWithEmailAndPassword(email, password);
+      await authService.signIn(email, password);
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
-      console.log(err.code);
-      setErrorMessage(getLoginErrorMessage(err.code));
-      setIsSigningIn(false);
+      setErrorMessage(getLoginErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
-  // TODO: for google sign in
-  /* const onGoogleSignIn = (e) => {
-    e.preventDefault()
-    if (!isSigningIn){
-      setIsSigningIn(true)
-      doSignInWithEmailAndPassword().catch(err => {
-        setIsSigningIn(false)
-      });
-    }
-  } */
-
   return (
     <div>
-      {userLoggedIn && <Navigate to={"/admin-dashboard"} replace={true} />}
       <div className="flex justify-center items-center min-h-screen min-w-screen">
         <div className="w-lg bg-black text-white rounded-md p-8">
           <form onSubmit={onSubmit}>
@@ -66,9 +53,7 @@ export default function AdminLogin() {
                 }}
                 className="font-prodFont text-white text-sm placeholder:text-gray-500 p-3 rounded-sm my-3 w-full border border-gray-600 focus:outline-1"
               />
-              <label className="text-sm text-prod-pink font-bold">
-                Password
-              </label>
+              <label className="text-sm text-prod-pink font-bold">Password</label>
               <div className="relative">
                 <input
                   type={show ? "text" : "password"}
