@@ -12,7 +12,6 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/client/NotFound";
 import ClientPageLayout from "./components/layouts/ClientPageLayout";
-import AdminPageLayout from "./components/layouts/AdminPageLayout";
 import { RequireAdmin } from "./db/services/adminAuthServices";
 import RedirectIfAuthed from "./db/services/redirectIfLoggedIn";
 
@@ -39,9 +38,7 @@ function App() {
           </Route>
 
           <Route element={<RequireAdmin />}>
-            <Route element={<AdminPageLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Route>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
           </Route>
         </Routes>
       </BrowserRouter>

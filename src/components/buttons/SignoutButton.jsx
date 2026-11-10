@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../../db/services/userAuthServices";
 import { LogOut } from "lucide-react";
 
-export const SignOutButton = () => {
+export default function SignOutButton({ className = "", size = "" }) {
   const navigate = useNavigate();
 
   const signOut = async () => {
@@ -15,8 +15,8 @@ export const SignOutButton = () => {
   };
 
   return (
-    <button type="button" className="h-full p-2" onClick={signOut}>
-      <LogOut />
+    <button type="button" className={className} onClick={signOut}>
+      <LogOut size={size} />
     </button>
   );
-};
+}
