@@ -3,8 +3,8 @@ import SignOutButton from "../buttons/SignoutButton";
 import ProdLogoWhite from "../../assets/logos/prod55-white.png";
 import { Camera, Images, UserGroup } from "lucide-react";
 
-export default function AdminSidebar() {
-  const [currentSelectedPage, setCurrentSelectedPage] = useState("gallery");
+export default function AdminSidebar({ value = "" }) {
+  const [currentSelectedPage, setCurrentSelectedPage] = useState(value || "gallery");
   const isSidebarOpen = useState(false);
 
   return (
@@ -53,10 +53,10 @@ export default function AdminSidebar() {
           </div>
         )}
       </div>
-      <div className="mx-auto pb-4">
+      <div title="byebye? :(" className="mx-auto pb-4">
         <SignOutButton
           size={35}
-          className="p-3 rounded-lg transition-colors ease-in-out duration-300 hover:bg-[#262626]"
+          className="p-3 rounded-lg transition-colors ease-in-out duration-300 hover:text-red-500 hover:bg-[#262626]"
         />
       </div>
     </div>

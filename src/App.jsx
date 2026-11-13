@@ -9,11 +9,13 @@ import Reviews from "./pages/client/Reviews";
 import Contact from "./pages/client/Contact";
 import AboutUs from "./pages/client/AboutUs";
 import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminGalleryDashboard from "./pages/admin/AdminGalleryDashboard";
 import NotFound from "./pages/client/NotFound";
 import ClientPageLayout from "./components/layouts/ClientPageLayout";
 import { RequireAdmin } from "./db/services/adminAuthServices";
 import RedirectIfAuthed from "./db/services/redirectIfLoggedIn";
+import AdminPageLayout from "./components/layouts/AdminPageLayout";
+import CreateEntry from "./pages/admin/CreateEntry";
 
 function App() {
   return (
@@ -38,7 +40,10 @@ function App() {
           </Route>
 
           <Route element={<RequireAdmin />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route element={<AdminPageLayout />}>
+              <Route path="/admin/dashboard/gallery" element={<AdminGalleryDashboard />} />
+            </Route>
+            <Route path="/admin/create-entry" element={<CreateEntry />} />
           </Route>
         </Routes>
       </BrowserRouter>

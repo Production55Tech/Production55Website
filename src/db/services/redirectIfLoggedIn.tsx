@@ -16,5 +16,5 @@ export default function RedirectIfAuthed() {
   }, []);
 
   if (loading) return null;
-  return user ? <Navigate to="/admin/dashboard" replace /> : <Outlet />;
+  return user ? <Navigate to="/admin/dashboard/gallery" replace /> : <Outlet />;
 }

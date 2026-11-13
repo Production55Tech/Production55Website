@@ -22,7 +22,7 @@ export default function AdminLogin() {
 
     try {
       await authService.signIn(email, password);
-      navigate("/admin/dashboard", { replace: true });
+      navigate("/admin/dashboard/gallery", { replace: true });
     } catch (err) {
       setErrorMessage(getLoginErrorMessage(err));
     } finally {
