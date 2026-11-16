@@ -4,7 +4,7 @@ import LogoPink from "../../assets/logos/prod55-pink.png";
 
 export default function ClientHeader() {
   return (
-    <header className="absolute top-0 z-50 pointer-events-none bg-none w-full overflow-x-hidden">
+    <header className="fixed top-0 z-50 pointer-events-none bg-linear-to-b from-black to-transparent w-full overflow-x-hidden mix-blend-exclusion">
       <div className="grid grid-cols-8 pointer-events-auto">
         <div className="flex justify-center my-auto pointer-events-auto">
           <NavLink
@@ -33,11 +33,11 @@ export default function ClientHeader() {
           <Link to="/" className="group grid overflow-hidden aspect-video">
             <img
               src={Logo}
-              className="col-start-1 row-start-1 object-contain w-[7dvw] h-[7dvh] transition-opacity duration-300 group-hover:opacity-0"
+              className="col-start-1 row-start-1 object-contain w-[8dvw] h-[8dvh] transition-opacity duration-300 group-hover:opacity-0"
             />
             <img
               src={LogoPink}
-              className="col-start-1 row-start-1 object-contain w-[7dvw] h-[7dvh] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              className="col-start-1 row-start-1 object-contain w-[8dvw] h-[8dvh] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />
           </Link>
         </div>
@@ -54,13 +54,13 @@ export default function ClientHeader() {
         </div>
         <div className="flex justify-center my-auto pointer-events-auto">
           <NavLink
-            to="/reviews"
+            to="/contact"
 
             className={({ isActive }) =>
               `transition-colors ${isActive ? "text-prod-pink" : "text-gray-300 hover:text-white"}`
             }
           >
-            REVIEWS
+            CONTACT
           </NavLink>
         </div>
       </div>

@@ -1,10 +1,6 @@
 import { useEffect, useRef } from "react";
-import WhiteVisuals from "../assets/visuals/visuals-black.png";
-import PinkVisuals from "../assets/visuals/visuals-pink.png";
 
 /* ── Images (edit these, or pass baseSrc / glowSrc / alt as props) ───── */
-const BASE_SRC = WhiteVisuals; // shown at rest
-const GLOW_SRC = PinkVisuals; // revealed around the cursor (same size/framing as BASE_SRC)
 const ALT = "";
 
 /* ── Feel (same meaning as in HighlightHoverText) ────────────────────── */
@@ -23,12 +19,18 @@ const SETTLE = 0.002; // a cell this close to its target snaps onto it (exact re
 const HOVER_ONLY = true; //  touch-only devices keep the plain <img>: no GL context, no textures
 const LOOKAHEAD = "200px"; // start fetching the glow image / creating GL this close to the viewport
 
+// The "object-fit: cover" crop is resolved per vertex (3 per draw), not per pixel:
+// the vertex shader turns the canvas UV into the image UV and the fragment shader just
+// receives it as a plain varying, so every texture fetch stays a simple, prefetchable read.
 const VERT = `#version 300 es
-out vec2 t;
+uniform vec4 u; // cover mapping: xy = scale, zw = offset
+out vec2 t;     // canvas-space UV (intensity field)
+out vec2 c;     // image-space UV (cover-cropped, used for both images)
 void main() {
   // one oversized triangle covering the screen, no vertex buffer needed
   vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
   t = vec2(p.x, 1.0 - p.y);
+  c = t * u.xy + u.zw;
   gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
 }`;
 
@@ -38,9 +40,10 @@ uniform sampler2D a; // base image
 uniform sampler2D b; // glow image
 uniform sampler2D f; // coarse intensity field (R8, bilinear-upscaled by the GPU)
 in vec2 t;
+in vec2 c;
 out vec4 o;
 void main() {
-  o = mix(texture(a, t), texture(b, t), texture(f, t).r);
+  o = mix(texture(a, c), texture(b, c), texture(f, t).r);
 }`;
 
 const clamp = (n, lo, hi) => (n < lo ? lo : n > hi ? hi : n);
@@ -55,8 +58,8 @@ const loaded = (im) =>
 
 export default function HighlightHoverImage({
   className = "",
-  baseSrc = BASE_SRC,
-  glowSrc = GLOW_SRC,
+  baseSrc = "",
+  glowSrc = "",
   alt = ALT,
 }) {
   const wrapRef = useRef(null);
@@ -86,6 +89,7 @@ export default function HighlightHoverImage({
     let texA = null;
     let texB = null;
     let texF = null;
+    let uCover = null;
     let glow = null;
 
     // coarse field grid (cell centres in CSS px, local to the canvas)
@@ -143,14 +147,7 @@ export default function HighlightHoverImage({
       gl.activeTexture(gl.TEXTURE0 + unit);
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA8,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        source,
-      );
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
       gl.generateMipmap(gl.TEXTURE_2D); // clean downscaling, no shimmer
       setTexParams(gl.LINEAR_MIPMAP_LINEAR);
@@ -161,17 +158,21 @@ export default function HighlightHoverImage({
       gl.activeTexture(gl.TEXTURE2);
       gl.bindTexture(gl.TEXTURE_2D, texF);
       gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.R8,
-        gw,
-        gh,
-        0,
-        gl.RED,
-        gl.UNSIGNED_BYTE,
-        bytes,
-      );
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gw, gh, 0, gl.RED, gl.UNSIGNED_BYTE, bytes);
+    };
+
+    // "object-fit: cover, centered": crop the image to the canvas aspect ratio.
+    // Depends only on the canvas ratio, so it is refreshed on canvas resize and on (re)build.
+    const setCover = () => {
+      if (!uCover || !canvas.width || !canvas.height || !img.naturalWidth || !img.naturalHeight)
+        return;
+      const ca = canvas.width / canvas.height;
+      const ia = img.naturalWidth / img.naturalHeight;
+      let sx = 1;
+      let sy = 1;
+      if (ca > ia) sy = ia / ca; // box is wider than the image: crop top/bottom
+      else sx = ca / ia; //         box is taller than the image: crop left/right
+      gl.uniform4f(uCover, sx, sy, (1 - sx) / 2, (1 - sy) / 2);
     };
 
     const build = () => {
@@ -189,6 +190,7 @@ export default function HighlightHoverImage({
       gl.uniform1i(gl.getUniformLocation(prog, "a"), 0);
       gl.uniform1i(gl.getUniformLocation(prog, "b"), 1);
       gl.uniform1i(gl.getUniformLocation(prog, "f"), 2);
+      uCover = gl.getUniformLocation(prog, "u");
 
       texA = imageTexture(img, 0);
       texB = imageTexture(glow, 1);
@@ -199,6 +201,7 @@ export default function HighlightHoverImage({
       setTexParams(gl.LINEAR);
       if (gw) uploadField();
       gl.viewport(0, 0, canvas.width, canvas.height);
+      setCover(); // a fresh program starts with zeroed uniforms (also covers context restore)
     };
 
     const release = () => {
@@ -207,7 +210,7 @@ export default function HighlightHoverImage({
       if (texA) gl.deleteTexture(texA);
       if (texB) gl.deleteTexture(texB);
       if (texF) gl.deleteTexture(texF);
-      prog = texA = texB = texF = null;
+      prog = texA = texB = texF = uCover = null;
     };
 
     const draw = () => gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -233,6 +236,7 @@ export default function HighlightHoverImage({
         canvas.width = pw; // clears the buffer, so redraw below in the same task
         canvas.height = ph;
         gl.viewport(0, 0, pw, ph);
+        setCover(); // new canvas ratio -> new crop (one uniform upload, only on resize)
       }
 
       const nx = clamp(Math.round(r.width / CELL), 4, MAX_CELLS);
@@ -342,22 +346,11 @@ export default function HighlightHoverImage({
       if (changed) {
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, texF);
-        gl.texSubImage2D(
-          gl.TEXTURE_2D,
-          0,
-          0,
-          0,
-          gw,
-          gh,
-          gl.RED,
-          gl.UNSIGNED_BYTE,
-          bytes,
-        );
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gw, gh, gl.RED, gl.UNSIGNED_BYTE, bytes);
         draw();
       }
 
-      if (busy || now - lastMove < OFFSET + 50)
-        raf = requestAnimationFrame(frame);
+      if (busy || now - lastMove < OFFSET + 50) raf = requestAnimationFrame(frame);
     };
 
     const wake = () => {
@@ -433,12 +426,8 @@ export default function HighlightHoverImage({
           if (!alive) return;
           const max = gl.getParameter(gl.MAX_TEXTURE_SIZE);
           if (
-            Math.max(
-              img.naturalWidth,
-              img.naturalHeight,
-              glow.naturalWidth,
-              glow.naturalHeight,
-            ) > max
+            Math.max(img.naturalWidth, img.naturalHeight, glow.naturalWidth, glow.naturalHeight) >
+            max
           )
             return;
           build();
@@ -480,7 +469,7 @@ export default function HighlightHoverImage({
 
   return (
     <div ref={wrapRef} className={className}>
-      <div className="relative">
+      <div className="relative h-full w-full">
         <img
           ref={imgRef}
           src={baseSrc}
@@ -488,7 +477,7 @@ export default function HighlightHoverImage({
           crossOrigin="anonymous"
           decoding="async"
           draggable={false}
-          className="block h-auto w-full select-none"
+          className="block h-full w-full select-none object-none"
         />
         <canvas
           ref={canvasRef}
