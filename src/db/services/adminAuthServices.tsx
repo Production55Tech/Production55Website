@@ -8,10 +8,12 @@ export function RequireAdmin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authService.getUser().then((u) => {
-      setUser(u);
-      setLoading(false);
-    });
+    authService
+      .getUser()
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+
     return authService.onAuthStateChange(setUser);
   }, []);
 
