@@ -3,6 +3,7 @@ import { useId, useRef, useState } from "react";
 import type { FileIcon } from "@untitledui/file-icons";
 import { FileIcon as FileTypeIcon } from "@untitledui/file-icons";
 import { CheckCircle, Trash01, UploadCloud02, XCircle } from "@untitledui/icons";
+import { SquareSparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/fileUploader/base/buttons/button";
 import { ButtonUtility } from "@/components/fileUploader/base/buttons/button-utility";
@@ -198,22 +199,26 @@ export const FileUploadDropZone = ({
       onDragLeave={handleDragOut}
       onDragEnd={handleDragOut}
       onDrop={handleDrop}
+      onClick={() => inputRef.current?.click()}
       className={cx(
-        "relative flex flex-col items-center gap-3 rounded-xl bg-primary px-6 py-4 text-tertiary ring-1 ring-secondary transition duration-100 ease-linear ring-inset",
-        isDraggingOver && "ring-2 ring-brand",
+        "relative flex flex-col items-center gap-4 rounded-lg bg-primary px-4 py-6 text-tertiary border-dashed border-2 border-white/30 transition hover:border-prod-pink duration-100 ease-linear cursor-pointer font-prodFont-bold group",
+        isDraggingOver && "border-prod-pink",
         isDisabled && "cursor-not-allowed bg-secondary",
         className,
       )}
     >
       <FeaturedIcon
         icon={UploadCloud02}
-        color="gray"
         theme="modern"
-        size="md"
-        className={cx(isDisabled && "opacity-50")}
+        size="lg"
+        className={cx(
+          isDisabled && "opacity-50",
+          "group-hover:text-prod-pink",
+          "transition-colors duration-100 ease-linear",
+        )}
       />
 
-      <div className="flex flex-col gap-1 text-center">
+      <div className="flex flex-col gap-1 text-center text-lg">
         <div className="flex justify-center gap-1 text-center">
           <input
             ref={inputRef}
@@ -226,24 +231,19 @@ export const FileUploadDropZone = ({
             onChange={handleInputFileChange}
           />
           <label htmlFor={id} className="flex cursor-pointer">
-            <Button
-              color="link-color"
-              size="md"
-              isDisabled={isDisabled}
-              onClick={() => inputRef.current?.click()}
-            >
-              Click to upload <span className="md:hidden">and attach files</span>
-            </Button>
+            <div color="link-color">
+              <span className="text-prod-pink">Click or drag and drop</span> to upload and attach
+              files
+            </div>
           </label>
-          <span className="text-sm max-md:hidden">or drag and drop</span>
         </div>
         <p
           className={cx(
-            "text-xs transition duration-100 ease-linear",
+            "text-xs transition duration-100 ease-linear font-prodFont",
             isInvalid && "text-error-primary",
           )}
         >
-          {hint || "SVG, PNG, JPG or GIF (max. 800x400px)"}
+          {hint || "SVG, PNG, JPG or GIF"}
         </p>
       </div>
     </div>
@@ -269,6 +269,10 @@ export interface FileListItemProps {
   onDelete?: () => void;
   /** The function to call when the file upload is retried. */
   onRetry?: () => void;
+  /** The function to call when the file is set as thumbnail. */
+  onSetThumbnail?: () => void;
+  /** Whether this file is currently the thumbnail. */
+  isThumbnail?: boolean;
 }
 
 export const FileListItemProgressBar = ({
@@ -280,6 +284,8 @@ export const FileListItemProgressBar = ({
   fileIconVariant,
   onDelete,
   onRetry,
+  onSetThumbnail,
+  isThumbnail,
   className,
 }: FileListItemProps) => {
   const isComplete = progress === 100;
@@ -288,8 +294,9 @@ export const FileListItemProgressBar = ({
     <motion.li
       layout="position"
       className={cx(
-        "relative flex gap-3 rounded-xl bg-primary p-4 ring-1 ring-secondary transition-shadow duration-100 ease-linear ring-inset",
+        "relative flex gap-3 rounded-lg bg-primary p-4 border border-dashed border-white/70 transition-shadow duration-100 ease-linear ring-inset",
         failed && "ring-2 ring-error",
+        isComplete && "border-solid",
         className,
       )}
     >
@@ -305,7 +312,6 @@ export const FileListItemProgressBar = ({
         theme="dark"
         variant={fileIconVariant ?? "default"}
       />
-
       <div className="flex min-w-0 flex-1 flex-col items-start">
         <div className="flex w-full max-w-full min-w-0 flex-1">
           <div className="min-w-0 flex-1">
@@ -337,14 +343,29 @@ export const FileListItemProgressBar = ({
             </div>
           </div>
 
-          <ButtonUtility
-            color="tertiary"
-            tooltip="Delete"
-            icon={Trash01}
-            size="xs"
-            className="-mt-2 -mr-2 self-start"
-            onClick={onDelete}
-          />
+          <div className="flex items-center gap-2 -mt-2 -mr-2 self-start">
+            <button
+              type="button"
+              onClick={onSetThumbnail}
+              disabled={isThumbnail}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors duration-100 ${
+                isThumbnail
+                  ? "bg-prod-pink/20 text-prod-pink border border-prod-pink/30 cursor-default"
+                  : "bg-white/5 text-white/70 border border-white/10 hover:bg-prod-pink/10 hover:text-prod-pink hover:border-prod-pink/20"
+              }`}
+            >
+              <SquareSparkles className="size-4" />
+              <span>Set as thumbnail</span>
+            </button>
+            <ButtonUtility
+              color="tertiary"
+              tooltip="Delete"
+              icon={Trash01}
+              size="sm"
+              className="transition-colors hover:text-prod-pink"
+              onClick={onDelete}
+            />
+          </div>
         </div>
 
         {!failed && (
@@ -372,6 +393,8 @@ export const FileListItemProgressFill = ({
   fileIconVariant,
   onDelete,
   onRetry,
+  onSetThumbnail,
+  isThumbnail,
   className,
 }: FileListItemProps) => {
   const isComplete = progress === 100;
@@ -379,7 +402,7 @@ export const FileListItemProgressFill = ({
   return (
     <motion.li
       layout="position"
-      className={cx("relative flex gap-3 overflow-hidden rounded-xl bg-primary p-4", className)}
+      className={cx("relative flex gap-3 overflow-hidden rounded-lg bg-primary p-4", className)}
     >
       {/* Progress fill. */}
       <div
@@ -448,14 +471,29 @@ export const FileListItemProgressFill = ({
           )}
         </div>
 
-        <ButtonUtility
-          color="tertiary"
-          tooltip="Delete"
-          icon={Trash01}
-          size="xs"
-          className="-mt-2 -mr-2 self-start"
-          onClick={onDelete}
-        />
+        <div className="flex items-center gap-2 -mt-2 -mr-2 self-start">
+          <button
+            type="button"
+            onClick={onSetThumbnail}
+            disabled={isThumbnail}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors duration-100 ${
+              isThumbnail
+                ? "bg-prod-pink/20 text-prod-pink border border-prod-pink/30 cursor-default"
+                : "bg-white/5 text-white/70 border border-white/10 hover:bg-prod-pink/10 hover:text-prod-pink hover:border-prod-pink/20"
+            }`}
+          >
+            <SquareSparkles className="size-3.5" />
+            <span>Set as thumbnail</span>
+          </button>
+          <ButtonUtility
+            color="tertiary"
+            tooltip="Delete"
+            icon={Trash01}
+            size="xs"
+            className="transition-colors hover:text-prod-pink"
+            onClick={onDelete}
+          />
+        </div>
       </div>
     </motion.li>
   );
