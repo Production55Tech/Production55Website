@@ -1,25 +1,33 @@
 import { Trash2, Pencil } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getGallery } from "../../db/api/GalleryApi";
 
-// TODO: Remove these hardcoded shite
 const COLUMNS = [
-  { key: "thumbnail", label: "Thumbnail", width: 140, min: 120 },
   { key: "title", label: "Title", width: 240, min: 120 },
-  { key: "date published", label: "Date Published", width: 150, min: 100 },
+  { key: "client", label: "Client", width: 200, min: 120 },
+  { key: "director", label: "Director", width: 180, min: 100 },
+  { key: "created_at", label: "Date Created", width: 150, min: 120 },
   { key: "actions", label: "Actions", width: 110, min: 110 },
 ];
 
-const galleryItems = [
-  {
-    id: 1,
-    thumbnail: "wow",
-    title: "Sunset at the Pier",
-    datePublished: "Nov 10, 2026",
-  },
-];
-
-export default function AdminDashboardTable() {
+export default function AdminDashboardTable({ searchQuery = "" }) {
   const [widths, setWidths] = useState(() => COLUMNS.map((c) => c.width));
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getGallery();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
 
   const startResize = (e, index) => {
     e.preventDefault();
@@ -46,10 +54,38 @@ export default function AdminDashboardTable() {
   };
 
   const fixedTotal = widths.reduce((sum, w) => sum + (w ?? 0), 0);
-  const [query, setQuery] = useState("");
-  const filteredItems = galleryItems.filter((item) =>
-    `${item.title} ${item.category} ${item.uploadedBy}`.toLowerCase().includes(query.toLowerCase()),
+  const filteredProjects = projects.filter((project) =>
+    `${project.slug ?? ""} ${project.client ?? ""} ${project.director ?? ""} ${project.created_by ?? ""}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase()),
   );
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  // TODO: update these functions for crud
+  const UpdateEntry = () => {
+    navigate("/admin/update-entry", { replace: true });
+  };
+
+  const DeleteEntry = () => {};
+
+  if (loading) {
+    return (
+      <div className="relative min-h-0 w-full flex-1 overflow-hidden rounded-lg bg-white/5">
+        <div className="custom-scrollbar h-full overflow-auto flex items-center justify-center py-12">
+          <div className="text-gray-400">Loading projects...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-0 w-full flex-1 overflow-hidden rounded-lg bg-white/5">
@@ -90,30 +126,33 @@ export default function AdminDashboardTable() {
           </thead>
 
           <tbody>
-            {filteredItems.map((item) => (
+            {filteredProjects.map((project) => (
               <tr
-                key={item.id}
+                key={project.id}
                 className="odd:bg-white/3 even:bg-white/4 cursor-pointer transition-colors hover:bg-white/10 font-prodFont"
               >
-                <td className="px-4 py-3">
-                  <img src={item.thumbnail} className="h-12 w-12 rounded-lg object-cover" />
+                <td className="truncate px-4 py-3 font-medium">{project.slug ?? "Untitled"}</td>
+                <td className="truncate px-4 py-3 text-gray-300">{project.client ?? "—"}</td>
+                <td className="truncate px-4 py-3 text-gray-300">{project.director ?? "—"}</td>
+                <td className="truncate px-4 py-3 text-gray-300">
+                  {formatDate(project.created_at)}
                 </td>
-                <td className="truncate px-4 py-3 font-medium">{item.title}</td>
-                <td className="truncate px-4 py-3 text-gray-300">{item.datePublished}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <button
+                      onClick={UpdateEntry}
                       title="Edit"
                       type="button"
-                      aria-label={`Edit ${item.title}`}
+                      aria-label={`Edit ${project.slug ?? "project"}`}
                       className="rounded-lg p-3 text-gray-300 transition-colors hover:bg-white/10 hover:text-prod-pink"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
-                      title="Delete :("
+                      onClick={DeleteEntry}
+                      title="Delete"
                       type="button"
-                      aria-label={`Delete ${item.title}`}
+                      aria-label={`Delete ${project.slug ?? "project"}`}
                       className="rounded-lg p-3 text-gray-300 transition-colors hover:bg-red-500/20 hover:text-red-500"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -123,10 +162,10 @@ export default function AdminDashboardTable() {
               </tr>
             ))}
 
-            {filteredItems.length === 0 && (
+            {filteredProjects.length === 0 && (
               <tr>
                 <td colSpan={COLUMNS.length} className="px-4 py-12 text-center text-gray-400">
-                  No images found.
+                  {searchQuery ? "No projects found." : "No projects yet."}
                 </td>
               </tr>
             )}

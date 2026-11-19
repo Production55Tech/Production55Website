@@ -10,12 +10,15 @@ import Contact from "./pages/client/Contact";
 import AboutUs from "./pages/client/AboutUs";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminGalleryDashboard from "./pages/admin/AdminGalleryDashboard";
+import AdminCrewDashboard from "./pages/admin/AdminCrewDashboard";
+import AdminGearDashboard from "./pages/admin/AdminGearDashboard";
 import NotFound from "./pages/client/NotFound";
 import ClientPageLayout from "./components/layouts/ClientPageLayout";
 import { RequireAdmin } from "./db/services/adminAuthServices";
 import RedirectIfAuthed from "./db/services/redirectIfLoggedIn";
 import AdminPageLayout from "./components/layouts/AdminPageLayout";
 import CreateEntry from "./pages/admin/CreateEntry";
+import UpdateEntry from "./pages/admin/UpdateEntry";
 
 function App() {
   return (
@@ -42,8 +45,11 @@ function App() {
           <Route element={<RequireAdmin />}>
             <Route element={<AdminPageLayout />}>
               <Route path="/admin/dashboard/gallery" element={<AdminGalleryDashboard />} />
+              <Route path="/admin/dashboard/crew" element={<AdminCrewDashboard />} />
+              <Route path="/admin/dashboard/gear" element={<AdminGearDashboard />} />
+              <Route path="/admin/create-entry" element={<CreateEntry />} />
+              <Route path="/admin/update-entry" element={<UpdateEntry />} />
             </Route>
-            <Route path="/admin/create-entry" element={<CreateEntry />} />
           </Route>
         </Routes>
       </BrowserRouter>

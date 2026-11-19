@@ -1,13 +1,13 @@
 import { supabase } from "../utils/supabaseClient";
 import type { Tables, TablesInsert, TablesUpdate } from "../helpers/database.types";
 
-export type Project = Tables<"projects">;
-type ProjectInsert = TablesInsert<"projects">;
-type ProjectUpdate = TablesUpdate<"projects">;
+export type Project = Tables<"gallery">;
+type ProjectInsert = TablesInsert<"gallery">;
+type ProjectUpdate = TablesUpdate<"gallery">;
 
-export async function getProjects() {
+export async function getGallery() {
   const { data, error } = await supabase
-    .from("projects")
+    .from("gallery")
     .select("*")
     .order("created_at", { ascending: false });
 
@@ -15,16 +15,16 @@ export async function getProjects() {
   return data;
 }
 
-export async function createProject(project: ProjectInsert) {
-  const { data, error } = await supabase.from("projects").insert(project).select().single();
+export async function createGallery(project: ProjectInsert) {
+  const { data, error } = await supabase.from("gallery").insert(project).select().single();
 
   if (error) throw error;
   return data;
 }
 
-export async function updateProject(id: Project["id"], changes: ProjectUpdate) {
+export async function updateGallery(id: Project["id"], changes: ProjectUpdate) {
   const { data, error } = await supabase
-    .from("projects")
+    .from("gallery")
     .update(changes)
     .eq("id", id)
     .select()
@@ -34,8 +34,8 @@ export async function updateProject(id: Project["id"], changes: ProjectUpdate) {
   return data;
 }
 
-export async function deleteProject(id: Project["id"]) {
-  const { data, error } = await supabase.from("projects").delete().eq("id", id).select();
+export async function deleteGallery(id: Project["id"]) {
+  const { data, error } = await supabase.from("gallery").delete().eq("id", id).select();
 
   if (error) throw error;
   if (data.length === 0) {

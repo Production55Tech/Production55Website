@@ -1,6 +1,6 @@
 export default function CreateEntry() {
   return (
-    <div>
+    <div className="">
       <div>hi</div>
     </div>
   );

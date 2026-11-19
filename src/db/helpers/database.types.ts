@@ -14,7 +14,25 @@ export type Database = {
   }
   public: {
     Tables: {
-      projects: {
+      crew: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: number
+        }
+        Relationships: []
+      }
+      gallery: {
         Row: {
           brief_description: string | null
           client: string | null
@@ -44,6 +62,24 @@ export type Database = {
           full_description?: string | null
           id?: number
           slug?: string | null
+        }
+        Relationships: []
+      }
+      gear: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: number
         }
         Relationships: []
       }

@@ -1,6 +1,5 @@
 import { Plus, Search, Settings2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import AdminSidebar from "../../components/sidebar/AdminSidebar";
 import { useState, useRef } from "react";
 import AdminDashboardTable from "../../components/tables/AdminDashboardTable";
 
@@ -8,6 +7,7 @@ export default function AdminGalleryDashboard() {
   const navigate = useNavigate();
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [panelHeight, setPanelHeight] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const panelRef = useRef(null);
 
   const toggleAdvancedFilter = () => {
@@ -30,6 +30,8 @@ export default function AdminGalleryDashboard() {
               <input
                 type="search"
                 placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-full w-full rounded-lg border-2 border-prod-pink pl-10 pr-3 text-lg outline-none focus:ring-2 focus:ring-prod-pink/80"
               />
             </div>
@@ -73,7 +75,7 @@ export default function AdminGalleryDashboard() {
         </div>
 
         {/* table thingy */}
-        <AdminDashboardTable />
+        <AdminDashboardTable searchQuery={searchQuery} />
         <div
           className="z-50 absolute bottom-10 right-10 w-15 h-15 bg-prod-pink text-white rounded-lg transition-transform hover:scale-110"
           title="Add New Entry"
