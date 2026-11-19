@@ -57,10 +57,10 @@ export default function AdminSidebar({ value = "" }) {
           </NavLink>
         )}
       </div>
-      <div title="byebye? :(" className="mx-auto">
+      <div className="mx-auto">
         <SignOutButton
           size={35}
-          className="p-3 rounded-lg transition-colors ease-in-out duration-300 hover:text-red-500 hover:bg-[#262626]"
+          className="p-3 rounded-lg transition-colors ease-in-out duration-300 hover:text-red-500 hover:bg-[#262626] z-50"
         />
       </div>
     </div>
