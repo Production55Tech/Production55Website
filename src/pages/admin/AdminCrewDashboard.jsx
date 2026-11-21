@@ -1,10 +1,8 @@
-import { Plus, Search, Settings2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Search, Settings2 } from "lucide-react";
 import { useState, useRef } from "react";
 import AdminDashboardTable from "../../components/tables/AdminDashboardTable";
 
 export default function AdminCrewDashboard() {
-  const navigate = useNavigate();
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [panelHeight, setPanelHeight] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,10 +11,6 @@ export default function AdminCrewDashboard() {
   const toggleAdvancedFilter = () => {
     setPanelHeight(showAdvancedFilters ? 0 : panelRef.current.scrollHeight);
     setShowAdvancedFilters((prev) => !prev);
-  };
-
-  const addNewEntry = () => {
-    navigate("/admin/create-entry", { replace: true });
   };
 
   return (
@@ -76,13 +70,6 @@ export default function AdminCrewDashboard() {
 
         {/* table thingy */}
         <AdminDashboardTable searchQuery={searchQuery} />
-        <div
-          className="z-50 absolute bottom-10 right-10 w-15 h-15 bg-prod-pink text-white rounded-lg transition-transform hover:scale-110"
-          title="Add New Entry"
-          onClick={addNewEntry}
-        >
-          <Plus className="absolute h-10 w-10 top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2" />
-        </div>
       </div>
     </div>
   );

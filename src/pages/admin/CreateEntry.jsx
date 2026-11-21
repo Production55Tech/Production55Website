@@ -1,4 +1,4 @@
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowLeft, Upload, Eye } from "lucide-react";
 import {
   FileUpload,
   FileUploadDropZone,
@@ -6,7 +6,6 @@ import {
   FileListItemProgressFill,
 } from "@/components/fileUploader/application/file-upload/file-upload-base";
 import { useState, useCallback } from "react";
-import Textarea from "@/components/forms/Textarea";
 
 export default function CreateEntry() {
   const [files, setFiles] = useState([]);
@@ -52,10 +51,16 @@ export default function CreateEntry() {
             <ArrowLeft size={22} />
             <span className="text-2xl uppercase">Back</span>
           </button>
-          <button className="flex items-center gap-2 py-3 px-4 bg-prod-pink rounded-lg text-black transition-colors hover:bg-prod-pink/90 hover:text-white">
-            <Upload size={20} />
-            <span className="text-2xl uppercase">Upload</span>
-          </button>
+          <div className="flex items-center justify-end gap-4">
+            <button className="flex items-center gap-2 py-3 px-4 bg-white rounded-lg text-prod-pink transition-colors hover:bg-prod-pink/90 hover:text-white">
+              <Eye size={20} />
+              <span className="text-2xl uppercase">Preview</span>
+            </button>
+            <button className="flex items-center gap-2 py-3 px-4 bg-prod-pink rounded-lg text-black transition-colors hover:bg-prod-pink/90 hover:text-white">
+              <Upload size={20} />
+              <span className="text-2xl uppercase">Upload</span>
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-[60%_40%] pt-12">
           <div className="flex flex-col gap-4 px-6 pr-10">
@@ -86,21 +91,19 @@ export default function CreateEntry() {
                 />
               </div>
               <div className="flex flex-col gap-1 col-span-6">
-                <Textarea
-                  label="Brief Description"
+                Brief Description
+                <textarea
                   placeholder="lorem ipsum?"
                   rows={2}
-                  minRows={2}
-                  maxRows={6}
+                  className="border-2 w-full border-white/40 rounded-lg font-prodFont p-2 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-prod-pink focus:border-transparent transition-colors duration-100"
                 />
               </div>
               <div className="flex flex-col gap-1 col-span-6">
-                <Textarea
-                  label="Full Description"
+                Full Description
+                <textarea
                   placeholder="Project description..."
                   rows={3}
-                  minRows={2}
-                  maxRows={20}
+                  className="border-2 w-full border-white/40 rounded-lg font-prodFont p-2 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-prod-pink focus:border-transparent transition-colors duration-100"
                 />
               </div>
             </div>
@@ -112,7 +115,7 @@ export default function CreateEntry() {
                   <FileUpload.DropZone onDropFiles={handleDrop} accept="image/*" />
                 </div>
                 <div className="flex-1 overflow-y-auto pr-1">
-                  <FileUpload.List>
+                  <FileUpload.List className="h-0">
                     {files.map((f) => (
                       <FileUpload.ListItemProgressBar
                         key={f.id}
